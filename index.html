@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leven · iOS / Flutter / AI 全栈工程师</title>
+  <meta name="description" content="Leven (刘文) — 十年移动端经验的 iOS / Flutter 全栈工程师，独立产品制造者，专注于克制的原生代码、精致 UI 交互与本地化 AI 应用落地。" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Noto+Serif+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Fraunces', 'Noto Serif SC', 'Georgia', 'serif'],
+            sans: ['Inter', 'Noto Serif SC', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            paper: '#FAF8F3',
+            ink: '#1A1A1A',
+            faint: '#6B6B6B',
+            mute: '#A39E92',
+            line: '#E5E0D5',
+            chip: '#F0EDE5',
+            accent: '#2D5016',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+      background: #FAF8F3;
+      color: #1A1A1A;
+      font-feature-settings: 'ss01', 'ss02';
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Breathing green dot */
+    @keyframes breathe {
+      0%, 100% { opacity: 0.75; transform: scale(1); }
+      50% { opacity: 0.2; transform: scale(1.6); }
+    }
+    .dot-pulse { animation: breathe 2.4s ease-in-out infinite; }
+
+    /* Hover underline — slow, refined */
+    .link-underline {
+      position: relative;
+      transition: color 220ms ease;
+    }
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 1px;
+      background: currentColor;
+      transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .link-underline:hover::after { width: 100%; }
+
+    /* Subtle shadow card — for screenshots */
+    .shot {
+      border-radius: 14px;
+      box-shadow:
+        0 1px 2px rgba(20, 18, 12, 0.04),
+        0 12px 28px rgba(20, 18, 12, 0.08);
+      transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1);
+      background: #fff;
+    }
+    .shot:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 1px 2px rgba(20, 18, 12, 0.04),
+        0 20px 44px rgba(20, 18, 12, 0.13);
+    }
+
+    /* Editorial drop-cap on intro */
+    .lede::first-letter {
+      font-family: 'Fraunces', 'Noto Serif SC', serif;
+      font-weight: 400;
+      font-size: 4.2rem;
+      line-height: 0.9;
+      float: left;
+      padding: 0.35rem 0.55rem 0 0;
+      color: #1A1A1A;
+    }
+
+    /* Section eyebrow */
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6B6B6B;
+    }
+
+    /* Chip — magazine-index style */
+    .chip {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      background: #F0EDE5;
+      color: #1A1A1A;
+      margin: 0 0.25rem 0.4rem 0;
+      transition: background 200ms ease;
+    }
+    .chip:hover { background: #E5E0D5; }
+
+    /* Divider hairline */
+    .hairline {
+      border-top: 1px solid #E5E0D5;
+    }
+
+    /* Print-friendly — pure paper feel */
+    @media print {
+      @page { margin: 18mm 14mm; }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 10.5pt;
+      }
+      .no-print { display: none !important; }
+      .shot {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+      }
+      a { color: #000 !important; text-decoration: none !important; }
+      a::after {
+        content: ' (' attr(href) ')';
+        font-size: 8pt;
+        color: #555;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      a[href^="mailto:"]::after,
+      a[href^="tel:"]::after { content: ''; }
+      h1, h2, h3, h4 { color: #000 !important; }
+      article { page-break-inside: avoid; }
+      .lede::first-letter { font-size: 2.8rem; }
+      .chip {
+        background: transparent !important;
+        border: 1px solid #ccc;
+        padding: 0.1rem 0.35rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="antialiased selection:bg-amber-200/60">
+
+  <main class="max-w-3xl mx-auto px-6 sm:px-10 lg:px-12 py-12 sm:py-20">
+
+    <!-- ─── STATUS INDICATOR ─────────────────────────────────────────── -->
+    <div class="flex items-center justify-end gap-2.5 mb-14 sm:mb-20 no-print">
+      <span class="relative inline-flex h-2 w-2">
+        <span class="absolute inline-flex h-full w-full rounded-full bg-green-500 dot-pulse"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-green-600"></span>
+      </span>
+      <span class="text-[0.7rem] tracking-[0.18em] uppercase text-faint font-mono">
+        Available for new opportunities
+      </span>
+    </div>
+
+    <!-- ─── HEADER ───────────────────────────────────────────────────── -->
+    <header class="mb-24 sm:mb-32">
+      <h1 class="font-serif text-6xl sm:text-7xl font-light tracking-tight leading-[0.95] mb-5">
+        Leven
+        <span class="block sm:inline text-faint font-light text-4xl sm:text-5xl sm:ml-3">· 刘文</span>
+      </h1>
+
+      <p class="font-serif italic text-xl sm:text-2xl text-faint mb-3">
+        Software Engineer / Independent Product Maker
+      </p>
+      <p class="font-serif text-base sm:text-lg text-faint mb-12">
+        软件工程师 · 独立产品制造者 · 十年移动端
+      </p>
+
+      <p class="lede font-serif text-lg sm:text-xl leading-[1.85] max-w-2xl text-ink/90">
+        我热衷于用克制的原生代码与精致的 UI 交互，构建真正解决问题、具有生命力的数字化产品。十年移动端深耕，目前专注于 iOS、Flutter 全栈开发，以及大模型 / Agent 在端侧的应用落地。
+      </p>
+
+      <div class="mt-12 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.78rem] font-mono text-faint">
+        <span>Wuhan · 武汉</span>
+        <span class="text-mute">/</span>
+        <a href="mailto:isrealleven@163.com" class="link-underline hover:text-ink">isrealleven@163.com</a>
+        <span class="text-mute">/</span>
+        <a href="tel:+8618371922512" class="link-underline hover:text-ink">+86 183 7192 2512</a>
+        <span class="text-mute">/</span>
+        <a href="https://github.com/LevenWin" target="_blank" rel="noopener" class="link-underline hover:text-ink">github.com/LevenWin</a>
+      </div>
+    </header>
+
+    <!-- ─── §01 STACK & EXPERTISE ────────────────────────────────────── -->
+    <section class="mb-24 sm:mb-32">
+      <div class="mb-12">
+        <p class="eyebrow mb-2">§ 01</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-light tracking-tight">
+          Stack &amp; Expertise
+        </h2>
+        <p class="font-serif italic text-faint mt-1">技术栈与能力索引</p>
+      </div>
+
+      <div class="space-y-8">
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-8 gap-y-2 items-baseline">
+          <p class="font-mono text-xs uppercase tracking-widest text-faint">Languages</p>
+          <div>
+            <span class="chip">Swift</span>
+            <span class="chip">Objective-C</span>
+            <span class="chip">Dart</span>
+            <span class="chip">TypeScript</span>
+            <span class="chip">JavaScript</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-8 gap-y-2 items-baseline">
+          <p class="font-mono text-xs uppercase tracking-widest text-faint">Frameworks</p>
+          <div>
+            <span class="chip">UIKit</span>
+            <span class="chip">SwiftUI</span>
+            <span class="chip">Flutter</span>
+            <span class="chip">React Native</span>
+            <span class="chip">WeChat Mini-Program</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-8 gap-y-2 items-baseline">
+          <p class="font-mono text-xs uppercase tracking-widest text-faint">AI &amp; Engine</p>
+          <div>
+            <span class="chip">LLM Application</span>
+            <span class="chip">Agent Workflow</span>
+            <span class="chip">Cocos2d-x ↔ Native</span>
+            <span class="chip">On-device AI</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-8 gap-y-2 items-baseline">
+          <p class="font-mono text-xs uppercase tracking-widest text-faint">Practice</p>
+          <div>
+            <span class="chip">Modular Architecture</span>
+            <span class="chip">Performance Tuning</span>
+            <span class="chip">i18n / Localization</span>
+            <span class="chip">App Store Review Ops</span>
+            <span class="chip">End-to-end Delivery</span>
+            <span class="chip">UI / Interaction Design</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── §02 SELECTED EXPERIENCE (公司经历) ───────────────────────── -->
+    <section class="mb-24 sm:mb-32">
+      <div class="mb-14">
+        <p class="eyebrow mb-2">§ 02</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-light tracking-tight">
+          Selected Experience
+        </h2>
+        <p class="font-serif italic text-faint mt-1">精选公司履历</p>
+      </div>
+
+      <!-- ── Article: 上海逆可网络科技 ───────────────────────────────── -->
+      <article class="mb-20 pb-16 hairline border-b">
+        <p class="eyebrow mb-3">2021 — Present · Senior iOS Engineer</p>
+        <h3 class="font-serif text-2xl sm:text-3xl font-medium mb-3 tracking-tight">
+          上海逆可网络科技
+        </h3>
+        <p class="font-serif italic text-faint text-lg leading-relaxed max-w-2xl mb-6">
+          独立承担一款时尚平台 App 从 0 到上线的核心研发，用模块化架构承载三块高度差异化的业务。
+        </p>
+
+        <div class="my-6 pl-5 border-l-2 border-line">
+          <p class="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-mute mb-1.5">Product</p>
+          <p class="font-serif text-base text-ink/90 mb-2 leading-relaxed">
+            <strong class="font-medium">Reversible Fashion Curated</strong> · 一款集 <em>时尚穿搭社区 + 分佣导购 + 二手 C2C 交易</em> 于一体的时尚消费 App。
+          </p>
+          <a href="https://apps.apple.com/cn/app/reversible-fashion-curated/id1582279514" target="_blank" rel="noopener"
+            class="font-mono text-xs link-underline text-faint hover:text-ink">
+            apps.apple.com/cn/app/id1582279514 →
+          </a>
+        </div>
+
+        <ul class="space-y-3 text-[1.02rem] leading-[1.85] text-ink/85">
+          <li>· 同时承接 <strong class="font-medium">分佣导购（交易逻辑）</strong>、<strong class="font-medium">二手交易（C2C 链路）</strong>、<strong class="font-medium">穿搭社区（内容社交）</strong> 三大业务模块，通过模块化架构保障系统灵活性与可维护性。</li>
+          <li>· 在职期间保持 <strong class="font-medium">极高交付质量</strong> 与 <strong class="font-medium">零重大线上事故</strong> 记录。</li>
+          <li>· 与产品、后端、UI 团队形成高效协作链路，主导多次跨端方案对齐与上线推进。</li>
+        </ul>
+      </article>
+
+      <!-- ── Article: 云账户数字科技 ───────────────────────────────── -->
+      <article class="mb-20 pb-16 hairline border-b">
+        <p class="eyebrow mb-3">2021.06 — 2021.12 · Senior Flutter Developer</p>
+        <h3 class="font-serif text-2xl sm:text-3xl font-medium mb-3 tracking-tight">
+          云账户数字科技（天津） · 实验技术部
+        </h3>
+        <p class="font-serif italic text-faint text-lg leading-relaxed max-w-2xl mb-6">
+          在快速迭代的实验团队中，用 Flutter 主导多款社交产品的从 0 到 1 落地。
+        </p>
+
+        <div class="my-6 pl-5 border-l-2 border-line">
+          <p class="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-mute mb-1.5">Product</p>
+          <p class="font-serif text-base text-ink/90 mb-2 leading-relaxed">
+            <strong class="font-medium">多款 Flutter 社交产品</strong> · 实验技术部内部孵化项目，聚焦轻量社交场景与跨平台体验探索。
+          </p>
+          <a href="https://www.yunzhanghu.com/" target="_blank" rel="noopener"
+            class="font-mono text-xs link-underline text-faint hover:text-ink">
+            yunzhanghu.com · 公司主页 →
+          </a>
+        </div>
+
+        <ul class="space-y-3 text-[1.02rem] leading-[1.85] text-ink/85">
+          <li>· 主导多款 <strong class="font-medium">Flutter 社交产品</strong> 0 → 1 全流程开发，兼顾高性能渲染与设计感表达。</li>
+          <li>· 专注于社交交互逻辑与跨平台架构优化，将复杂业务转化为极简的用户体验。</li>
+        </ul>
+      </article>
+
+      <!-- ── Article: 携程 ─────────────────────────────────────────── -->
+      <article class="mb-20 pb-16 hairline border-b">
+        <p class="eyebrow mb-3">2021.01 — 2021.03 · React Native Developer</p>
+        <h3 class="font-serif text-2xl sm:text-3xl font-medium mb-3 tracking-tight">
+          携程计算机技术（上海）
+        </h3>
+        <p class="font-serif italic text-faint text-lg leading-relaxed max-w-2xl mb-6">
+          在大厂标准流程下，负责火车票国际站的跨平台研发与复杂国际化业务实现。
+        </p>
+
+        <div class="my-6 pl-5 border-l-2 border-line">
+          <p class="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-mute mb-1.5">Product</p>
+          <p class="font-serif text-base text-ink/90 mb-2 leading-relaxed">
+            <strong class="font-medium">携程火车票 · 国际站（Trip.com Trains）</strong> · 携程出海业务线下的国际火车票预订入口，覆盖多语种、多币种、多铁路系统的复杂国际化场景。
+          </p>
+          <a href="https://www.trip.com/trains/" target="_blank" rel="noopener"
+            class="font-mono text-xs link-underline text-faint hover:text-ink">
+            trip.com/trains →
+          </a>
+        </div>
+      </article>
+
+      <!-- ── Article: 叽里呱啦 ─────────────────────────────────────── -->
+      <article class="mb-20 pb-16 hairline border-b">
+        <p class="eyebrow mb-3">2019.06 — 2021.01 · Senior iOS Engineer</p>
+        <h3 class="font-serif text-2xl sm:text-3xl font-medium mb-3 tracking-tight">
+          叽里呱啦文化传播
+        </h3>
+        <p class="font-serif italic text-faint text-lg leading-relaxed max-w-2xl mb-6">
+          支撑千万级用户量、DAU 60 万+ 的核心 App 迭代，主导游戏化教学场景与原生系统的融合。
+        </p>
+
+        <div class="my-6 pl-5 border-l-2 border-line">
+          <p class="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-mute mb-1.5">Product</p>
+          <p class="font-serif text-base text-ink/90 mb-2 leading-relaxed">
+            <strong class="font-medium">叽里呱啦</strong> · 面向 0–8 岁儿童的在线英语启蒙 App，融合动画课程、游戏互动与"听说读写玩"闭环教学体系。
+          </p>
+          <a href="https://apps.apple.com/cn/app/%E5%8F%BD%E9%87%8C%E5%91%B1%E5%95%A6/id928864273" target="_blank" rel="noopener"
+            class="font-mono text-xs link-underline text-faint hover:text-ink">
+            apps.apple.com/cn/app/id928864273 →
+          </a>
+        </div>
+
+        <ul class="space-y-3 text-[1.02rem] leading-[1.85] text-ink/85">
+          <li>· 主导 <strong class="font-medium">Cocos2d-x 与 Native (iOS)</strong> 核心通讯链路设计，实现游戏化教学场景与原生系统的高效融合。</li>
+          <li>· 深度参与核心课程体系流程管理与逻辑开发，保障"听说读写玩"闭环体验在复杂交互下的稳定性。</li>
+          <li>· 支撑 <strong class="font-medium">DAU 60 万+</strong> 与 <strong class="font-medium">单日营收破亿</strong> 的极端流量挑战，持续优化 App 运行效率。</li>
+          <li>· 作为技术核心成员，助力公司完成 <strong class="font-medium">由腾讯领投的 B 轮融资</strong>。</li>
+        </ul>
+      </article>
+
+      <!-- ── Article: 别样 ─────────────────────────────────────────── -->
+      <article class="mb-8">
+        <p class="eyebrow mb-3">2016.10 — 2019.07 · iOS Developer · Founding Engineer</p>
+        <h3 class="font-serif text-2xl sm:text-3xl font-medium mb-3 tracking-tight">
+          上海别样秀数据科技
+        </h3>
+        <p class="font-serif italic text-faint text-lg leading-relaxed max-w-2xl mb-6">
+          作为别样 App 早期核心 iOS 开发，专注跨境电商全链路的端侧体验打磨。
+        </p>
+
+        <div class="my-6 pl-5 border-l-2 border-line">
+          <p class="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-mute mb-1.5">Product</p>
+          <p class="font-serif text-base text-ink/90 mb-2 leading-relaxed">
+            <strong class="font-medium">别样海外购</strong> · 一站式海淘服务平台，连接数百家海外顶级商家与国内千万级用户。
+          </p>
+          <a href="https://apps.apple.com/cn/app/%E5%88%AB%E6%A0%B7%E6%B5%B7%E5%A4%96%E8%B4%AD-%E6%B5%B7%E6%B7%98%E4%B8%93%E5%AE%B6%E4%B8%80%E7%AB%99%E5%BC%8F%E6%9C%8D%E5%8A%A1/id947269781" target="_blank" rel="noopener"
+            class="font-mono text-xs link-underline text-faint hover:text-ink">
+            apps.apple.com/cn/app/id947269781 →
+          </a>
+        </div>
+
+        <ul class="space-y-3 text-[1.02rem] leading-[1.85] text-ink/85">
+          <li>· 连接数百家海外顶级商家与国内千万级用户，参与跨境电商全链路技术实现。</li>
+          <li>· 助力 App 实现 <strong class="font-medium">从 20 万到 800 万用户</strong> 的增长，并助力公司完成 <strong class="font-medium">B 轮融资</strong>。</li>
+          <li>· 追求极致的端侧体验与极简设计。</li>
+        </ul>
+        <p class="font-serif italic text-sm text-mute mt-10 text-right">
+          — 各阶段所列产品均为代表作，并非完整作品集。
+        </p>
+      </article>
+    </section>
+
+    <!-- ─── §03 INDEPENDENT STUDIO (独立产品) ────────────────────────── -->
+    <section class="mb-24 sm:mb-32">
+      <div class="mb-14">
+        <p class="eyebrow mb-2">§ 03</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-light tracking-tight">
+          Independent Studio
+        </h2>
+        <p class="font-serif italic text-faint mt-1">独立产品 · Indie iOS Apps</p>
+      </div>
+
+      <p class="font-serif italic text-faint text-lg leading-relaxed max-w-2xl mb-12">
+        主职之外，我独立设计、开发并运营了多款上架 App Store 的 iOS 产品。以下是其中三款代表作。
+      </p>
+
+      <!-- App: Reptime -->
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-x-10 gap-y-6 items-start mb-14">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <img
+              src="https://lc-gluttony.s3.amazonaws.com/hgdwiHQX9b2V/JWz52DeSqXWzBBB4K761PFnoyAVAaWCH/%E5%AE%B9%E5%99%A8%201%401x.png"
+              alt="Reptime icon" class="w-12 h-12 rounded-xl shot" />
+            <div>
+              <h4 class="font-serif text-xl font-medium">Reptime</h4>
+              <p class="font-mono text-[0.7rem] tracking-wider uppercase text-faint">Healthy Screen-Time</p>
+            </div>
+          </div>
+          <p class="text-[1.02rem] leading-[1.8] text-ink/85 mb-4">
+            通过完成俯卧撑等简单运动来"赚取"屏幕使用时间——把自律转化为正向激励的健康习惯。
+          </p>
+          <a href="https://apps.apple.com/us/app/id6756785140" target="_blank" rel="noopener"
+            class="font-mono text-xs uppercase tracking-widest link-underline hover:text-ink text-faint">
+            Download on the App Store →
+          </a>
+        </div>
+        <div class="flex gap-3 md:justify-self-end">
+          <img src="https://lc-gluttony.s3.amazonaws.com/hgdwiHQX9b2V/UCQK6LAUtRKOXhCoiCX1rj3w6arleARI/image%401x.png"
+            alt="Reptime screenshot" class="shot w-[100px] sm:w-[105px] object-cover" />
+          <img src="https://lc-gluttony.s3.amazonaws.com/hgdwiHQX9b2V/xPzG9kApikFzC5UQel7CmrreU7TUMXTX/image%401x-2.png"
+            alt="Reptime screenshot" class="shot w-[100px] sm:w-[105px] object-cover" />
+        </div>
+      </div>
+
+      <!-- App: HAHAS -->
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-x-10 gap-y-6 items-start mb-14">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <img
+              src="https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/9e/9c/01/9e9c0122-6e70-ec81-6e94-74e09b91278e/AppIcon-0-0-1x_U007epad-0-1-85-220.png/300x300bb.png"
+              alt="HAHAS icon" class="w-12 h-12 rounded-xl shot" />
+            <div>
+              <h4 class="font-serif text-xl font-medium">HAHAS</h4>
+              <p class="font-mono text-[0.7rem] tracking-wider uppercase text-faint">Infinite Laughs · Pure Chaos</p>
+            </div>
+          </div>
+          <p class="text-[1.02rem] leading-[1.8] text-ink/85 mb-4">
+            一键开启，永不停止的笑声。极简交互背后藏着病毒式的传播力——警告：副作用包含在公共场合不受控地大笑。
+          </p>
+          <a href="https://app.diandian.com/app/xoupuz5p8r776sl/ios?market=1&country=24&id=6761530564&n=HAHAS%253A%2520laugh%2520forever%252C%2520no%2520try&language=12"
+            target="_blank" rel="noopener"
+            class="font-mono text-xs uppercase tracking-widest link-underline hover:text-ink text-faint">
+            Download on the App Store →
+          </a>
+        </div>
+        <div class="flex gap-3 md:justify-self-end">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/91/de/56/91de5607-fc59-4c76-e996-68d9e932c29c/_U5bb9_U5668_1.png/414x896bb.png"
+            alt="HAHAS screenshot" class="shot w-[100px] sm:w-[105px] object-cover" />
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/6a/c8/4a/6ac84ab2-6a94-22a0-969d-77da7cc9e58a/_U5bb9_U5668_3.png/414x896bb.png"
+            alt="HAHAS screenshot" class="shot w-[100px] sm:w-[105px] object-cover" />
+        </div>
+      </div>
+
+      <!-- App: VibeDrive -->
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-x-10 gap-y-6 items-start">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <img
+              src="https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/0c/64/1a/0c641a29-33f6-cb69-e77f-243197ecb75a/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/300x300bb.jpg"
+              alt="VibeDrive icon" class="w-12 h-12 rounded-xl shot" />
+            <div>
+              <h4 class="font-serif text-xl font-medium">VibeDrive</h4>
+              <p class="font-mono text-[0.7rem] tracking-wider uppercase text-faint">AI · Reimagine Your Car</p>
+            </div>
+          </div>
+          <p class="text-[1.02rem] leading-[1.8] text-ink/85 mb-4">
+            基于 AI 即刻重塑你的爱车——尝试新车色、加装定制部件，或将其置于电影级场景之中。AI 生成式视觉的端侧落地实践。
+          </p>
+          <a href="https://app.diandian.com/app/xoupuz5p8r776sl/ios?market=1&country=24&id=6761530564&n=HAHAS%253A%2520laugh%2520forever%252C%2520no%2520try&language=12"
+            target="_blank" rel="noopener"
+            class="font-mono text-xs uppercase tracking-widest link-underline hover:text-ink text-faint">
+            Download on the App Store →
+          </a>
+        </div>
+        <div class="flex gap-3 md:justify-self-end">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/ee/9e/90/ee9e9083-61c4-1e5b-8871-07c86b9c4638/_U5bb9_U5668_246.png/414x896bb.png"
+            alt="VibeDrive screenshot" class="shot w-[100px] sm:w-[105px] object-cover" />
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/df/e6/66/dfe666a2-2a36-1727-4ce3-6c953e912163/_U5bb9_U5668_243.png/414x896bb.png"
+            alt="VibeDrive screenshot" class="shot w-[100px] sm:w-[105px] object-cover" />
+        </div>
+      </div>
+
+      <p class="font-serif italic text-sm text-mute mt-10 text-right">
+        — 另有数款个人作品因篇幅暂未列举。
+      </p>
+    </section>
+
+    <!-- ─── §04 EDUCATION & CERT ─────────────────────────────────────── -->
+    <section class="mb-24 sm:mb-32">
+      <div class="mb-12">
+        <p class="eyebrow mb-2">§ 04</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-light tracking-tight">
+          Education &amp; Credentials
+        </h2>
+        <p class="font-serif italic text-faint mt-1">教育经历与资格证书</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-8 gap-y-4 items-baseline mb-8">
+        <p class="font-mono text-xs uppercase tracking-widest text-faint">2012 — 2016</p>
+        <div>
+          <h4 class="font-serif text-xl font-medium">三峡大学 · China Three Gorges University</h4>
+          <p class="font-serif italic text-faint mt-1">本科 · 电子信息工程（移动互联网应用方向）</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-8 gap-y-2 items-baseline">
+        <p class="font-mono text-xs uppercase tracking-widest text-faint">Credentials</p>
+        <div>
+          <span class="chip">CET-6 · 大学英语六级</span>
+          <span class="chip">NCRE-4 · 计算机四级</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── COLOPHON / CONTACT ───────────────────────────────────────── -->
+    <footer class="pt-12 hairline border-t">
+      <p class="eyebrow mb-4">Colophon</p>
+      <p class="font-serif italic text-faint text-base sm:text-lg leading-relaxed max-w-2xl mb-6">
+        感谢你读到这里。如果对合作 / 机会感兴趣，欢迎通过下方任一方式联系我——通常会在 24 小时内回复。
+      </p>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.78rem] font-mono text-faint">
+        <a href="mailto:isrealleven@163.com" class="link-underline hover:text-ink">isrealleven@163.com</a>
+        <span class="text-mute">/</span>
+        <a href="tel:+8618371922512" class="link-underline hover:text-ink">+86 183 7192 2512</a>
+        <span class="text-mute">/</span>
+        <a href="https://github.com/LevenWin" target="_blank" rel="noopener" class="link-underline hover:text-ink">github.com/LevenWin</a>
+      </div>
+      <p class="mt-12 text-[0.7rem] font-mono text-mute tracking-wider">
+        © 2026 Leven · Set in Fraunces &amp; Noto Serif SC · Hand-crafted single-page édition.
+      </p>
+    </footer>
+
+  </main>
+
+</body>
+</html>
