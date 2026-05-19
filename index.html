@@ -122,6 +122,46 @@
     }
     .chip:hover { background: #E5E0D5; }
 
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #E5E0D5;
+      border-top-color: #2D5016;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .pdf-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      background: rgba(250, 248, 243, 0.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms ease;
+    }
+    .pdf-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .pdf-overlay p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6B6B6B;
+    }
+
     /* Divider hairline */
     .hairline {
       border-top: 1px solid #E5E0D5;
@@ -166,14 +206,23 @@
   <main class="max-w-3xl mx-auto px-6 sm:px-10 lg:px-12 py-12 sm:py-20">
 
     <!-- ─── STATUS INDICATOR ─────────────────────────────────────────── -->
-    <div class="flex items-center justify-end gap-2.5 mb-14 sm:mb-20 no-print">
-      <span class="relative inline-flex h-2 w-2">
-        <span class="absolute inline-flex h-full w-full rounded-full bg-green-500 dot-pulse"></span>
-        <span class="relative inline-flex h-2 w-2 rounded-full bg-green-600"></span>
-      </span>
-      <span class="text-[0.7rem] tracking-[0.18em] uppercase text-faint font-mono">
-        Available for new opportunities
-      </span>
+    <div class="flex items-center justify-between mb-14 sm:mb-20 no-print">
+      <button id="btn-export-pdf" onclick="exportPDF()"
+        class="font-mono text-[0.7rem] tracking-[0.14em] uppercase text-faint hover:text-ink transition-colors duration-200 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        Export PDF
+      </button>
+      <div class="flex items-center gap-2.5">
+        <span class="relative inline-flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-green-500 dot-pulse"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-green-600"></span>
+        </span>
+        <span class="text-[0.7rem] tracking-[0.18em] uppercase text-faint font-mono">
+          Available for new opportunities
+        </span>
+      </div>
     </div>
 
     <!-- ─── HEADER ───────────────────────────────────────────────────── -->
@@ -565,6 +614,31 @@
     </footer>
 
   </main>
+
+  <div id="pdf-loading-overlay" class="pdf-overlay no-print">
+    <div class="spinner"></div>
+    <p>Generating PDF…</p>
+  </div>
+
+  <script>
+    function exportPDF() {
+      var overlay = document.getElementById('pdf-loading-overlay');
+      overlay.classList.add('active');
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          window.print();
+          setTimeout(function () {
+            overlay.classList.remove('active');
+          }, 600);
+        });
+      });
+    }
+
+    window.onafterprint = function () {
+      document.getElementById('pdf-loading-overlay').classList.remove('active');
+    };
+  </script>
 
 </body>
 </html>
